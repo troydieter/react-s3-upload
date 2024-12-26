@@ -1,61 +1,55 @@
 import AWS from "aws-sdk";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function App() {
-  // Create state to store file
   const [file, setFile] = useState(null);
+  const [s3, setS3] = useState(null);
 
-  // Function to upload file to s3
-  const uploadFile = async () => {
-    // S3 Bucket Name
-    const S3_BUCKET = "bucket-name";
-
-    // S3 Region
-    const REGION = "region";
-
-    // S3 Credentials
+  useEffect(() => {
+    // Configure AWS SDK
     AWS.config.update({
-      accessKeyId: "youraccesskeyhere",
-      secretAccessKey: "yoursecretaccesskeyhere",
-    });
-    const s3 = new AWS.S3({
-      params: { Bucket: S3_BUCKET },
-      region: REGION,
+      accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+      region: process.env.REACT_APP_REGION,
     });
 
-    // Files Parameters
+    // Create S3 instance
+    const s3Instance = new AWS.S3({
+      params: { Bucket: process.env.REACT_APP_S3_BUCKET },
+      region: process.env.REACT_APP_REGION,
+    });
+
+    setS3(s3Instance);
+  }, []);
+
+  const uploadFile = async () => {
+    if (!s3 || !file) return;
 
     const params = {
-      Bucket: S3_BUCKET,
+      Bucket: process.env.REACT_APP_S3_BUCKET,
       Key: file.name,
       Body: file,
     };
 
-    // Uploading file to s3
-
-    var upload = s3
-      .putObject(params)
-      .on("httpUploadProgress", (evt) => {
-        // File uploading progress
+    try {
+      const upload = s3.putObject(params).on("httpUploadProgress", (evt) => {
         console.log(
           "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
         );
-      })
-      .promise();
+      }).promise();
 
-    await upload.then((err, data) => {
-      console.log(err);
-      // Fille successfully uploaded
+      await upload;
       alert("File uploaded successfully.");
-    });
+    } catch (err) {
+      console.error(err);
+      alert("An error occurred while uploading the file.");
+    }
   };
-  // Function to handle file and store it to file state
+
   const handleFileChange = (e) => {
-    // Uploaded file
-    const file = e.target.files[0];
-    // Changing file state
-    setFile(file);
+    setFile(e.target.files[0]);
   };
+
   return (
     <div className="App">
       <div>
