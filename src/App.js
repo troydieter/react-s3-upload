@@ -1,5 +1,6 @@
 import AWS from "aws-sdk";
 import { useState, useEffect } from "react";
+import { v4 as uuidv4 } from 'uuid';
 
 function App() {
   const [licenseFile, setLicenseFile] = useState(null);
@@ -7,6 +8,7 @@ function App() {
   const [s3, setS3] = useState(null);
   const [licenseFileName, setLicenseFileName] = useState("No file chosen");
   const [selfieFileName, setSelfieFileName] = useState("No file chosen");
+  const [uuid, setUuid] = useState(null);
 
   useEffect(() => {
     // Configure AWS SDK
@@ -23,14 +25,16 @@ function App() {
     });
 
     setS3(s3Instance);
+    setUuid(uuidv4());
   }, []);
 
   const uploadFile = async (file, label) => {
-    if (!s3 || !file) return;
+    if (!s3 || !file || !uuid) return;
 
+    const folder = label === "DriversLicense" ? "dl" : "selfie";
     const params = {
       Bucket: process.env.REACT_APP_S3_BUCKET,
-      Key: `${label}/${file.name}`,
+      Key: `${uuid}/${folder}/${file.name}`,
       Body: file,
     };
 
