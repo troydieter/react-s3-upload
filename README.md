@@ -13,8 +13,9 @@ Before you begin, ensure you have the following installed:
 - npm (v6.0.0 or later)
 
 You will also need:
+- A deployment of [the Amazon Rekognition Identity Verification sample repository](https://github.com/troydieter/amazon-rekognition-identity-verification) first. You'll use the output from this to feed the `.env` file for credentials.
 - An AWS account with S3 access
-- AWS access key ID and secret access key
+- AWS access key ID and secret access key (retrieved from the Amazon Rekognition Identity Verification sample deployment)
 
 ## Setup
 
