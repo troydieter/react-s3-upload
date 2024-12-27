@@ -52,9 +52,12 @@ function App() {
 
   return (
     <div className="App">
-      <div>
-        <input type="file" onChange={handleFileChange} />
-        <button onClick={uploadFile}>Upload</button>
+      <div className="upload-container">
+        <div className="upload-box">
+          <h2>Upload Your File</h2>
+          <input type="file" onChange={handleFileChange} />
+          <button onClick={uploadFile}>Upload</button>
+        </div>
       </div>
     </div>
   );

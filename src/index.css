@@ -5,9 +5,73 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #ffffff;
+  color: #232f3e; /* Amazon dark text color */
+}
+
+header {
+  background-color: #232f3e; /* Amazon header dark blue */
+  color: #ffffff;
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+footer {
+  background-color: #37475a; /* Slightly lighter blue for footer */
+  color: #ffffff;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+button {
+  background-color: #ffa41c; /* Amazon orange */
+  color: #ffffff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #ff8c00; /* Darker orange for hover effect */
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+  background-color: #f6f6f6; /* Light grey background for code */
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  color: #232f3e;
+}
+
+a {
+  color: #007185; /* Amazon link blue */
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+a:hover {
+  color: #ffa41c; /* Link hover effect to match button orange */
+}
+
+/* Center the upload section */
+.upload-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+  background-color: #f6f6f6; /* Optional: light background for visibility */
+}
+
+.upload-box {
+  padding: 2rem;
+  border: 2px dashed #007185; /* Amazon link blue for border */
+  border-radius: 8px;
+  background-color: #ffffff;
+  text-align: center;
 }
