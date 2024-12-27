@@ -2,6 +2,10 @@
 
 This React application allows users to upload driver's license and selfie images to an AWS S3 bucket for ID verification purposes.
 
+<p align="center">
+  <img src="preview.png" />
+</p>
+
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
