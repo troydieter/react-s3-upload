@@ -1,70 +1,104 @@
-# Getting Started with Create React App
+# AnyCompany ID Verification System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This React application allows users to upload driver's license and selfie images to an AWS S3 bucket for ID verification purposes.
 
-## Available Scripts
+## Prerequisites
 
-In the project directory, you can run:
+Before you begin, ensure you have the following installed:
+- Node.js (v14.0.0 or later)
+- npm (v6.0.0 or later)
 
-### `npm start`
+You will also need:
+- An AWS account with S3 access
+- AWS access key ID and secret access key
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Setup
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+1. Clone the repository:
+   ```
+   git clone https://github.com/your-username/anycompany-id-verification.git
+   cd anycompany-id-verification
+   ```
 
-### `npm test`
+2. Install dependencies:
+   ```
+   npm install
+   ```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+3. Set up environment variables:
+   - Copy the `.env.example` file to a new file named `.env`:
+     ```
+     cp .env.example .env
+     ```
+   - Open the `.env` file and replace the placeholder values with your actual AWS credentials and S3 bucket information:
+     ```
+     REACT_APP_AWS_ACCESS_KEY_ID=your_access_key_id
+     REACT_APP_AWS_SECRET_ACCESS_KEY=your_secret_access_key
+     REACT_APP_REGION=your_aws_region
+     REACT_APP_S3_BUCKET=your_s3_bucket_name
+     ```
 
-### `npm run build`
+## Running the Application
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+To start the development server:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```
+npm start
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+This will run the app in development mode. Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-### `npm run eject`
+## Building for Production
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+To create a production build:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```
+npm run build
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+This command builds the app for production to the `build` folder. It correctly bundles React in production mode and optimizes the build for the best performance.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+To serve the production build locally:
 
-## Learn More
+```
+npm install -g serve
+serve -s build
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Usage
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+1. Open the application in a web browser.
+2. You will see two upload boxes: one for the driver's license and one for the selfie.
+3. Click "Choose File" to select an image for each category.
+4. Click the "Upload" button for each image to send it to the S3 bucket.
+5. The files will be uploaded to a unique folder in your S3 bucket, named with the current date, time, and a UUID.
 
-### Code Splitting
+## Folder Structure in Amazon S3
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+The uploaded files will be stored in S3 with the following structure:
 
-### Analyzing the Bundle Size
+```
+YYYY-MM-DD_HH-MM-SS_UUID/
+├── dl/
+│   └── drivers_license_filename.jpg
+└── selfie/
+    └── selfie_filename.jpg
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Troubleshooting
 
-### Making a Progressive Web App
+- If you encounter CORS issues, ensure your S3 bucket has the appropriate CORS configuration.
+- Check that your AWS credentials in the `.env` file are correct and have the necessary permissions.
+- If the application isn't picking up your environment variables, try restarting the development server.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Security Note
 
-### Advanced Configuration
+This application handles sensitive information. Ensure that you follow best practices for securing your AWS credentials and protecting user data. Never commit your `.env` file to version control.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Contributing
 
-### Deployment
+If you'd like to contribute, please fork the repository and use a feature branch. Pull requests are warmly welcome.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Licensing
 
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+The code in this project is licensed under MIT license.
