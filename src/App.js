@@ -8,7 +8,7 @@ function App() {
   const [s3, setS3] = useState(null);
   const [licenseFileName, setLicenseFileName] = useState("No file chosen");
   const [selfieFileName, setSelfieFileName] = useState("No file chosen");
-  const [uuid, setUuid] = useState(null);
+  const [folderName, setFolderName] = useState(null);
 
   useEffect(() => {
     // Configure AWS SDK
@@ -25,16 +25,22 @@ function App() {
     });
 
     setS3(s3Instance);
-    setUuid(uuidv4());
+
+    // Generate folder name with date, timestamp, and UUID
+    const now = new Date();
+    const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+    const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS
+    const uuid = uuidv4();
+    setFolderName(`${dateStr}_${timeStr}_${uuid}`);
   }, []);
 
   const uploadFile = async (file, label) => {
-    if (!s3 || !file || !uuid) return;
+    if (!s3 || !file || !folderName) return;
 
     const folder = label === "DriversLicense" ? "dl" : "selfie";
     const params = {
       Bucket: process.env.REACT_APP_S3_BUCKET,
-      Key: `${uuid}/${folder}/${file.name}`,
+      Key: `${folderName}/${folder}/${file.name}`,
       Body: file,
     };
 
