@@ -1,7 +1,6 @@
 import AWS from "aws-sdk";
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { secret } from '@aws-amplify/backend';
 
 function App() {
   const [licenseFile, setLicenseFile] = useState(null);
@@ -12,28 +11,16 @@ function App() {
   const [sessionId, setSessionId] = useState(null);
 
   useEffect(() => {
-    // // Configure AWS SDK
-    // AWS.config.update({
-    //   accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-    //   secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-    //   region: process.env.REACT_APP_REGION,
-    // });
-
-    // // Create S3 instance
-    // const s3Instance = new AWS.S3({
-    //   params: { Bucket: process.env.REACT_APP_S3_BUCKET },
-    //   region: process.env.REACT_APP_REGION,
-    // });
     // Configure AWS SDK
     AWS.config.update({
-      accessKeyId: secret('REACT_APP_AWS_ACCESS_KEY_ID'),
-      secretAccessKey: secret('REACT_APP_AWS_SECRET_ACCESS_KEY'),
+      accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
       region: process.env.REACT_APP_REGION,
     });
 
     // Create S3 instance
     const s3Instance = new AWS.S3({
-      params: { Bucket: secret('REACT_APP_S3_BUCKET') },
+      params: { Bucket: process.env.REACT_APP_S3_BUCKET },
       region: process.env.REACT_APP_REGION,
     });
 
