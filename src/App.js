@@ -1,6 +1,6 @@
 import AWS from "aws-sdk";
 import { useState, useEffect } from "react";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 function App() {
   const [licenseFile, setLicenseFile] = useState(null);
@@ -8,7 +8,7 @@ function App() {
   const [s3, setS3] = useState(null);
   const [licenseFileName, setLicenseFileName] = useState("No file chosen");
   const [selfieFileName, setSelfieFileName] = useState("No file chosen");
-  const [folderName, setFolderName] = useState(null);
+  const [sessionId, setSessionId] = useState(null);
 
   useEffect(() => {
     // Configure AWS SDK
@@ -26,33 +26,39 @@ function App() {
 
     setS3(s3Instance);
 
-    // Generate folder name with date, timestamp, and UUID
-    const now = new Date();
-    const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
-    const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS
+    // Generate a unique session ID
     const uuid = uuidv4();
-    setFolderName(`${dateStr}_${timeStr}_${uuid}`);
+    setSessionId(uuid);
   }, []);
 
   const uploadFile = async (file, label) => {
-    if (!s3 || !file || !folderName) return;
+    if (!s3 || !file || !sessionId) return;
 
-    const folder = label === "DriversLicense" ? "dl" : "selfie";
+    // Use consistent naming for the Lambda function to process files
+    const fileName = label === "DriversLicense" ? `${sessionId}_dl.jpg` : `${sessionId}_selfie.jpg`;
     const params = {
       Bucket: process.env.REACT_APP_S3_BUCKET,
-      Key: `${folderName}/${folder}/${file.name}`,
+      Key: fileName,
       Body: file,
     };
 
     try {
-      const upload = s3.putObject(params).on("httpUploadProgress", (evt) => {
-        console.log(
-          `Uploading ${label}: ` + parseInt((evt.loaded * 100) / evt.total) + "%"
-        );
-      }).promise();
+      const upload = s3
+        .putObject(params)
+        .on("httpUploadProgress", (evt) => {
+          console.log(
+            `Uploading ${label}: ` + parseInt((evt.loaded * 100) / evt.total) + "%"
+          );
+        })
+        .promise();
 
       await upload;
       alert(`${label} uploaded successfully.`);
+
+      // Notify the user when the selfie is uploaded (triggers Lambda)
+      if (label === "Selfie") {
+        alert("Thank you, verifying your identity based on the uploaded images...");
+      }
     } catch (err) {
       console.error(err);
       alert(`An error occurred while uploading the ${label}.`);
