@@ -139,3 +139,34 @@ hr {
     padding: 1.5rem;
   }
 }
+
+.upload-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background-color: #f6f6f6;
+}
+
+.upload-button {
+  display: block;
+  width: 100%;
+  max-width: 400px; /* Match the max-width of upload-box */
+  margin: 2rem auto 0; /* Center the button horizontally and add top margin */
+  padding: 0.75rem;
+  font-size: 1rem;
+  text-align: center;
+  background-color: #ffa41c;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.upload-button:hover {
+  background-color: #ff8c00;
+}
+

@@ -1,69 +1,79 @@
-import AWS from "aws-sdk";
-import { useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { useState } from "react";
+import axios from "axios";
 
 function App() {
   const [licenseFile, setLicenseFile] = useState(null);
   const [selfieFile, setSelfieFile] = useState(null);
-  const [s3, setS3] = useState(null);
   const [licenseFileName, setLicenseFileName] = useState("No file chosen");
   const [selfieFileName, setSelfieFileName] = useState("No file chosen");
-  const [sessionId, setSessionId] = useState(null);
 
-  useEffect(() => {
-    // Configure AWS SDK
-    AWS.config.update({
-      accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-      region: process.env.REACT_APP_REGION,
+  const API_URL = `${process.env.REACT_APP_API_URL}/compare-faces`;
+
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = (error) => reject(error);
     });
+  };
 
-    // Create S3 instance
-    const s3Instance = new AWS.S3({
-      params: { Bucket: process.env.REACT_APP_S3_BUCKET },
-      region: process.env.REACT_APP_REGION,
-    });
-
-    setS3(s3Instance);
-
-    // Generate a unique session ID
-    const uuid = uuidv4();
-    setSessionId(uuid);
-  }, []);
-
-  const uploadFile = async (file, label) => {
-    if (!s3 || !file || !sessionId) return;
-
-    // Use consistent naming for the Lambda function to process files
-    const fileName = label === "DriversLicense" ? `${sessionId}_dl.jpg` : `${sessionId}_selfie.jpg`;
-    const params = {
-      Bucket: process.env.REACT_APP_S3_BUCKET,
-      Key: fileName,
-      Body: file,
-    };
-
+  const uploadFiles = async () => {
+    if (!licenseFile || !selfieFile) {
+      alert("Please select both a driver's license and a selfie.");
+      return;
+    }
+  
     try {
-      const upload = s3
-        .putObject(params)
-        .on("httpUploadProgress", (evt) => {
-          console.log(
-            `Uploading ${label}: ` + parseInt((evt.loaded * 100) / evt.total) + "%"
-          );
-        })
-        .promise();
-
-      await upload;
-      alert(`${label} uploaded successfully.`);
-
-      // Notify the user when the selfie is uploaded (triggers Lambda)
-      if (label === "Selfie") {
-        alert("Thank you, verifying your identity based on the uploaded images...");
-      }
-    } catch (err) {
-      console.error(err);
-      alert(`An error occurred while uploading the ${label}.`);
+      const licenseBase64 = await convertToBase64(licenseFile);
+      const selfieBase64 = await convertToBase64(selfieFile);
+  
+      const response = await axios.post(`${API_URL}`, 
+        {
+          dl: licenseBase64,
+          selfie: selfieBase64
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': process.env.REACT_APP_API_KEY
+          }
+        }
+      );
+    
+      console.log('Full response:', response);
+  
+      if (response.status === 200 && response.data && response.data.body) {
+        const bodyData = JSON.parse(response.data.body);
+        console.log('Parsed body data:', bodyData);
+      
+        if (bodyData.verificationId && bodyData.result && typeof bodyData.result.similarity !== 'undefined') {
+          const roundedSimilarity = parseFloat(bodyData.result.similarity).toFixed(2);
+          const verificationId = bodyData.verificationId;
+          let message;
+      
+          if (roundedSimilarity >= 80) {
+            message = `Verification successful.\nVerification ID: ${verificationId}\nSimilarity: ${roundedSimilarity}%`;
+          } else if (roundedSimilarity > 0) {
+            message = `Verification failed.\nVerification ID: ${verificationId}\nSimilarity: ${roundedSimilarity}%\nThe similarity score is below the required threshold of 80%.`;
+          } else {
+            message = `Verification failed.\nVerification ID: ${verificationId}\nNo face matches found.`;
+          }
+      
+          alert(message);
+        } else {
+          throw new Error('Unexpected data format in response body');
+        }
+      } else {
+        console.error('Unexpected response format:', response.data);
+        throw new Error('Unexpected response format');
+      } 
+    } catch (error) {
+      console.error('Error:', error);
+      alert('An error occurred during the verification process.');
     }
   };
+  
 
   const handleLicenseChange = (e) => {
     const file = e.target.files[0];
@@ -93,12 +103,6 @@ function App() {
             Choose File
           </label>
           <div className="file-name">{licenseFileName}</div>
-          <button
-            className="upload-button"
-            onClick={() => uploadFile(licenseFile, "DriversLicense")}
-          >
-            Upload Driver's License
-          </button>
         </div>
 
         <div className="upload-box">
@@ -114,13 +118,11 @@ function App() {
             Choose File
           </label>
           <div className="file-name">{selfieFileName}</div>
-          <button
-            className="upload-button"
-            onClick={() => uploadFile(selfieFile, "Selfie")}
-          >
-            Upload Selfie
-          </button>
         </div>
+
+        <button className="upload-button" onClick={uploadFiles}>
+          Verify Identity
+        </button>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 # AnyCompany ID Verification System
 
-This React application allows users to upload driver's license and selfie images to an AWS S3 bucket for ID verification purposes.
+This React application allows users to upload driver's license and selfie images for ID verification purposes.
 
 <p align="center">
   <img src="preview.png" />
@@ -14,8 +14,7 @@ Before you begin, ensure you have the following installed:
 
 You will also need:
 - A deployment of [the Amazon Rekognition Identity Verification sample repository](https://github.com/troydieter/amazon-rekognition-identity-verification) first. You'll use the output from this to feed the `.env` file for credentials.
-- An AWS account with S3 access
-- AWS access key ID and secret access key (retrieved from the Amazon Rekognition Identity Verification sample deployment)
+- An AWS account
 
 ## Setup
 
@@ -37,10 +36,8 @@ You will also need:
      ```
    - Open the `.env` file and replace the placeholder values with your actual AWS credentials and S3 bucket information:
      ```
-     REACT_APP_AWS_ACCESS_KEY_ID=your_access_key_id
-     REACT_APP_AWS_SECRET_ACCESS_KEY=your_secret_access_key
-     REACT_APP_REGION=your_aws_region
-     REACT_APP_S3_BUCKET=your_s3_bucket_name
+      REACT_APP_API_URL=https://example.execute-api.REGION.amazonaws.com/api
+      REACT_APP_API_KEY=xyz123
      ```
 
 ## Running the Application
@@ -75,24 +72,10 @@ serve -s build
 1. Open the application in a web browser.
 2. You will see two upload boxes: one for the driver's license and one for the selfie.
 3. Click "Choose File" to select an image for each category.
-4. Click the "Upload" button for each image to send it to the S3 bucket.
-5. The files will be uploaded to a unique folder in your S3 bucket, named with the current date, time, and a UUID.
-
-## Folder Structure in Amazon S3
-
-The uploaded files will be stored in S3 with the following structure:
-
-```
-YYYY-MM-DD_HH-MM-SS_UUID/
-├── dl/
-│   └── drivers_license_filename.jpg
-└── selfie/
-    └── selfie_filename.jpg
-```
+4. Click the "Verify Identity" button at the bottom for it to be processed.
 
 ## Troubleshooting
 
-- If you encounter CORS issues, ensure your S3 bucket has the appropriate CORS configuration.
 - Check that your AWS credentials in the `.env` file are correct and have the necessary permissions.
 - If the application isn't picking up your environment variables, try restarting the development server.
 
